@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="AskSeparate" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/AskSeparate" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++1y" />
+					<Add option="-g" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add library="boost_system" />
+					<Add library="boost_serialization" />
+					<Add library="armadillo" />
+					<Add library="mlpack" />
+					<Add directory="include" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/AskSeparate" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="include/Algorithms/AsK/AsKLauncher.cpp" />
+		<Unit filename="include/Algorithms/AsK/AsKLauncher.h" />
+		<Unit filename="include/Algorithms/AsK/BranchDetection.cpp" />
+		<Unit filename="include/Algorithms/AsK/BranchDetection.h" />
+		<Unit filename="include/Algorithms/AsK/BranchSimplification.cpp" />
+		<Unit filename="include/Algorithms/AsK/BranchSimplification.h" />
+		<Unit filename="include/Algorithms/AsK/CorrectStraightening.h" />
+		<Unit filename="include/Algorithms/Convertors/InputReader.cpp" />
+		<Unit filename="include/Algorithms/Convertors/InputReader.h" />
+		<Unit filename="include/Algorithms/Convertors/MatToGraph.h" />
+		<Unit filename="include/Algorithms/Convertors/OutputPrinter.cpp" />
+		<Unit filename="include/Algorithms/Convertors/OutputPrinter.h" />
+		<Unit filename="include/Algorithms/Distances/PointSegmentDistance.h" />
+		<Unit filename="include/Graph/Graph.cpp" />
+		<Unit filename="include/Graph/Graph.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

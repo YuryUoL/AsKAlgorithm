@@ -1,0 +1,5 @@
+required libraries for compilation:
+- boost_system
+- boost_serialization
+- Armadillo
+- mlpack
