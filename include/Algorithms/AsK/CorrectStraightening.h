@@ -7,6 +7,7 @@
 #include <mlpack/methods/neighbor_search/neighbor_search.hpp>
 #include "Algorithms/Distances/PointSegmentDistance.h"
 #include "Algorithms/Convertors/OutputPrinter.h"
+#include "Algorithms/Convertors/PathToGraph.h"
 
 
 class CorrectStraightening
@@ -77,13 +78,9 @@ public:
                 coloring[flyingSheep] = true;
                 while (boost::degree(flyingSheep, G) == 2)
                 {
-                    if (stupidcount < 100)
-                    {
-                        stupidcount++;
-                    }
-                    //!  std::cout << "In loop " << flyingSheep << "degree: " <<  boost::degree(flyingSheep, G) << std::endl;
+
                     paths[paths.size()-1].push_back(flyingSheep);
-                    //! flyingSheep --- //
+
                     coloring[flyingSheep] = true;
                     flyingSheep = GetOnlyCorrectNeighbor(G, flyingSheep, coloring);
                 }
@@ -102,13 +99,15 @@ public:
         for(int i = 0; i < paths.size(); i++)
         {
             resultingPaths.push_back(std::vector<int>());
-            resultingPaths[resultingPaths.size()-1].push_back(GraphToCloud[paths[i][0]]);
-
+            //   resultingPaths[resultingPaths.size()-1].push_back(GraphToCloud[paths[i][0]]);
+            //  std::vector<double> distances;
             for (int j = 0 ; j < paths[i].size() - 1; j++)
             {
+                resultingPaths[resultingPaths.size()-1].push_back(GraphToCloud[paths[i][j]]);
                 arma::mat segment(cloud.n_rows, 2);
                 segment.col(0) = G[paths[i][j]].p;
                 segment.col(1) = G[paths[i][j+1]].p;
+
                 auto eitt = boost::edge(paths[i][j], paths[i][j+1], G).first;
                 std::sort(G[eitt].indices.begin(), G[eitt].indices.end(), [&segment, &cloud](int a, int b)
                 {
@@ -116,13 +115,15 @@ public:
                     double t2 = arma::dot(cloud.col(b)-segment.col(0),segment.col(1)-segment.col(0)) / (arma::dot(segment.col(1)-segment.col(0),segment.col(1)-segment.col(0)));
                     return t < t2;
                 });
-
-                for (int xx = 0; xx < G[eitt].indices.size(); xx++)
+                for (int i = 0; i < G[eitt].indices.size(); i++)
                 {
-                    resultingPaths[resultingPaths.size()-1].push_back((G[eitt].indices)[xx]);
+                    resultingPaths[resultingPaths.size()-1].push_back(G[eitt].indices[i]);
+
                 }
 
+
             }
+
             int tmpSize = paths[i].size();
             resultingPaths[resultingPaths.size()-1].push_back(GraphToCloud[paths[i][tmpSize-1]]);
 
@@ -132,6 +133,7 @@ public:
 
     static void PointsToSegments(MyGraphType & G, arma::mat & cloud, std::vector<int> & CloudToGraph, double & maxDistance, std::vector<int> & correspondance)
     {
+
 
         arma::mat referenceSet;
         MatToGraph::Reverse(referenceSet, G);
@@ -144,7 +146,7 @@ public:
         for (int i = 0; i < correspondance.size(); i++)
         {
             int iter = resultingNeighbors(0,i);
-          //  int planetEarth = CloudToGraph[iter];
+            //  int planetEarth = CloudToGraph[iter];
             int planetEarth = iter;
             //  int iter = correspondance[i];
 
@@ -159,7 +161,6 @@ public:
             }
             //std::cout << "i: " << i << " | correspondance[i]: " << iter << " | CloudToGraph[y]:" << planetEarth << std::endl;
             //std::cout << "i: " << i << " | CloudToGraph[i]: " << CloudToGraph[i] <<  std::endl;
-
 
             auto edges = boost::out_edges(planetEarth,G);
             double minDz = std::numeric_limits<double>::max();
@@ -183,14 +184,6 @@ public:
 
         }
 
-        auto vpair = boost::edges(G);
-        int sum = 0;
-        int numm = 0;
-        for (auto it = vpair.first ; it != vpair.second ; it++)
-        {
-            numm++;
-            sum = sum + G[*it].indices.size();
-        }
 
     }
 
@@ -216,9 +209,10 @@ public:
     }
 
 
-    static bool RunTheAlgorithm(arma::mat & cloud, std::vector<int> & points, std::vector<int> & thepath, double e)
+    static bool RunTheAlgorithm(arma::mat & cloud, std::vector<int> & points, std::vector<int> & thepath, std::vector<int> & indexedPath, double e)
     {
         thepath.push_back(points[0]);
+        indexedPath.push_back(0);
         int sizepath = points.size();
         int a = 0;
         int b = 0;
@@ -253,18 +247,52 @@ public:
             if (b < points.size())
             {
                 thepath.push_back(points[b]);
+                indexedPath.push_back(b);
+
             }
             else
             {
                 thepath.push_back(points[points.size()-1]);
+                indexedPath.push_back(points.size()-1);
             }
             a = a + 1;
         }
         return true;
     }
 
+    static void handleBelonghood(std::vector<int> & indexedPath, arma::mat & cloud, std::vector<int> & belonghood, std::vector<int> & tmp)
+    {
+        int j = 1;
+        for (int i = 0; i < tmp.size(); i++)
+        {
+            while(i > indexedPath[j])
+            {
+                j++;
+            }
+            if (indexedPath[j] == i)
+            {
+                belonghood[tmp[i]] = tmp[indexedPath[j]];
+            }
+            else
+            {
+                double d1 = mlpack::metric::EuclideanDistance::Evaluate(cloud.col(tmp[indexedPath[j]]), cloud.col(tmp[i]));
+                double d2 = mlpack::metric::EuclideanDistance::Evaluate(cloud.col(tmp[indexedPath[j-1]]), cloud.col(tmp[i]));
+                if (d1 < d2)
+                {
+                    belonghood[tmp[i]] = tmp[indexedPath[j]];
 
-    static double ComputeStraightening(MyGraphType & Simplified, arma::mat & cloud, std::vector<std::vector<int>> & out, double e, std::vector<int> & CloudToGraph, std::vector<int> & GraphToCloud, std::vector<int> & correspondance)
+
+                }
+                else
+                {
+                    belonghood[tmp[i]] = tmp[indexedPath[j-1]];
+                }
+
+            }
+        }
+    }
+
+    static double ComputeStraightening(MyGraphType & Simplified, arma::mat & cloud, std::vector<std::vector<int>> & out, double e, std::vector<int> & CloudToGraph, std::vector<int> & GraphToCloud, std::vector<int> & correspondance,   std::vector<int> & belonghood)
     {
         // OutputPrinter::DebugGraph("/home/yury/LocalTests4/MicelleOutputsWorm/graphDebug.txt", Simplified);
 
@@ -273,12 +301,17 @@ public:
         CorrectStraightening::PathCreator(Simplified, cloud, tmp, CloudToGraph, GraphToCloud, MaxDistance, correspondance);
         //OutputPrinter::InfoToCsv(std::string path, std::vector<int> & indices, arma::mat & cloud)
 
-
         out.resize(tmp.size());
         for (int i = 0; i < tmp.size(); i++)
         {
-            CorrectStraightening::RunTheAlgorithm(cloud, tmp[i], out[i], e * MaxDistance);
+            MyGraphType stupid;
+            std::vector<int> indexedPath;
+            CorrectStraightening::RunTheAlgorithm(cloud, tmp[i], out[i], indexedPath, e * MaxDistance);
+            CorrectStraightening::handleBelonghood(indexedPath, cloud, belonghood, tmp[i]);
+
         }
+
+
         return MaxDistance;
 
 

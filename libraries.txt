@@ -3,3 +3,4 @@ required libraries for compilation:
 - boost_serialization
 - Armadillo
 - mlpack
+- boost_filesystem (To run tests)

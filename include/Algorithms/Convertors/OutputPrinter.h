@@ -14,6 +14,8 @@ class OutputPrinter
         static void DebugArray(std::string path, std::vector<int> & correspondance, std::vector<bool> & coloring,  MyGraphType & G);
         static void InfoToCsv(std::string path, std::vector<int> & indices, arma::mat & cloud);
         static void PrintThreshedOnly(std::string path, MyGraphType & G, std::vector<double> & threshes, double thresh, std::vector<bool> & branchedCandidate);
+        static void InfoToCsvSeparate(std::string path, std::vector<int> & indices, arma::mat & cloud);
+
 
 
 

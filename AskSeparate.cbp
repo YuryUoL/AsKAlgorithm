@@ -21,6 +21,7 @@
 					<Add library="boost_serialization" />
 					<Add library="armadillo" />
 					<Add library="mlpack" />
+					<Add library="boost_filesystem" />
 					<Add directory="include" />
 				</Linker>
 			</Target>
@@ -54,6 +55,7 @@
 		<Unit filename="include/Algorithms/Convertors/OutputPrinter.cpp" />
 		<Unit filename="include/Algorithms/Convertors/OutputPrinter.h" />
 		<Unit filename="include/Algorithms/Distances/PointSegmentDistance.h" />
+		<Unit filename="include/Algorithms/PostProcessing/PostProcessor.h" />
 		<Unit filename="include/Graph/Graph.cpp" />
 		<Unit filename="include/Graph/Graph.h" />
 		<Unit filename="main.cpp" />

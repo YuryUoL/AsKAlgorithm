@@ -1,0 +1,105 @@
+# depslib dependency file v1.0
+1591019553 source:/home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/AsK/BranchDetection.cpp
+	"BranchDetection.h"
+	"Algorithms/Convertors/OutputPrinter.h"
+
+1590756538 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/AsK/BranchDetection.h
+	"Graph/Graph.h"
+	<functional>
+	<queue>
+	<vector>
+
+1591090540 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Graph/Graph.h
+	<mlpack/core.hpp>
+	<boost/graph/adjacency_list.hpp>
+	<boost/graph/properties.hpp>
+	<boost/property_map/property_map.hpp>
+	<boost/program_options.hpp>
+	<boost/graph/graphviz.hpp>
+	<boost/graph/dijkstra_shortest_paths.hpp>
+	<boost/graph/depth_first_search.hpp>
+	<boost/graph/prim_minimum_spanning_tree.hpp>
+	<boost/graph/kruskal_min_spanning_tree.hpp>
+	<boost/graph/connected_components.hpp>
+
+1591262161 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/Convertors/OutputPrinter.h
+	"Graph/Graph.h"
+
+1590656804 source:/home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/Convertors/InputReader.cpp
+	"InputReader.h"
+	<fstream>
+	"Graph/Graph.h"
+
+1589797147 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/Convertors/InputReader.h
+	<string>
+	<mlpack/core.hpp>
+
+1591006259 source:/home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Graph/Graph.cpp
+	"Graph.h"
+
+1591704244 source:/home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/AsK/AsKLauncher.cpp
+	"Algorithms/AsK/AsKLauncher.h"
+	<mlpack/methods/emst/dtb.hpp>
+	"Algorithms/Convertors/MatToGraph.h"
+	"Algorithms/AsK/BranchDetection.h"
+	"Algorithms/AsK/CorrectStraightening.h"
+	"Algorithms/AsK/BranchSimplification.h"
+	"Algorithms/PostProcessing/PostProcessor.h"
+
+1591704255 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/AsK/AsKLauncher.h
+	<mlpack/core.hpp>
+	"Graph/Graph.h"
+
+1590658753 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/Convertors/MatToGraph.h
+	"Graph/Graph.h"
+	<mlpack/core.hpp>
+
+1591352735 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/AsK/CorrectStraightening.h
+	"Graph/Graph.h"
+	<mlpack/core.hpp>
+	<mlpack/methods/neighbor_search/neighbor_search.hpp>
+	"Algorithms/Distances/PointSegmentDistance.h"
+	"Algorithms/Convertors/OutputPrinter.h"
+	"Algorithms/Convertors/PathToGraph.h"
+
+1590667697 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/Distances/PointSegmentDistance.h
+	<mlpack/core.hpp>
+
+1591274354 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/Convertors/PathToGraph.h
+	"Graph/Graph.h"
+
+1591257290 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/AsK/BranchSimplification.h
+	"Graph/Graph.h"
+
+1591701599 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/PostProcessing/PostProcessor.h
+	"Graph/Graph.h"
+	<mlpack/core.hpp>
+	"Algorithms/Convertors/npy.hpp"
+
+1510338749 /home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/Convertors/npy.hpp
+	<complex>
+	<fstream>
+	<string>
+	<iostream>
+	<sstream>
+	<cstdint>
+	<cstring>
+	<vector>
+	<stdexcept>
+	<algorithm>
+	<regex>
+	<unordered_map>
+
+1591620483 source:/home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/AsK/BranchSimplification.cpp
+	"BranchSimplification.h"
+
+1591350875 source:/home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/include/Algorithms/Convertors/OutputPrinter.cpp
+	"OutputPrinter.h"
+
+1592039083 source:/home/yury/Dropbox/ExtraProjects/ClusterMST/AskSeparate/AskSeparate/main.cpp
+	<iostream>
+	"Algorithms/Convertors/OutputPrinter.h"
+	"Algorithms/Convertors/InputReader.h"
+	"Algorithms/AsK/AsKLauncher.h"
+	<boost/filesystem.hpp>
+

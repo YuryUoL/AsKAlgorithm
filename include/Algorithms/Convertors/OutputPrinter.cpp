@@ -21,16 +21,10 @@ void OutputPrinter::PrintThreshedOnly(std::string path, MyGraphType & G, std::ve
                 mystream << G[(*it)].p(j) << ", ";
             }
               mystream << std::endl;
-
         }
         //  double k = (double) threshes[*it];
         // mystream << k << std::endl;
-
-
-
     }
-
-
 
 
     mystream.close();
@@ -57,6 +51,33 @@ void OutputPrinter::ThreshColored(std::string path, MyGraphType & G, std::vector
     }
     mystream.close();
 
+
+
+}
+
+
+
+void OutputPrinter::InfoToCsvSeparate(std::string path, std::vector<int> & indices, arma::mat & cloud)
+{
+    std::ofstream mystream;
+    mystream.open(path);
+    mystream << "x, y, z, t" << std::endl;
+    for (int i = 0 ; i < indices.size(); i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            mystream << cloud(j,indices[i]);
+
+            mystream << ", ";
+
+        }
+        double k = (double) indices[i];
+        mystream << k << std::endl;
+
+
+
+    }
+    mystream.close();
 
 
 }

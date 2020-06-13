@@ -47,9 +47,10 @@ void BranchSimplification::ConvertToCustomGraph(std::vector<std::vector<int>> & 
     }
 }
 
-void BranchSimplification::SimplifyIt(std::vector<std::vector<int>> & in, MyGraphType & Final, double threshold, arma::mat & cloud)
+void BranchSimplification::SimplifyIt(std::vector<std::vector<int>> & in, MyGraphType & Final, double threshold, arma::mat & cloud,  std::vector<int> & oldToNew)
 {
 
+    //oldToNew.resize(cloud.n_cols);
 
     std::vector<int> CloudToGraph(cloud.n_cols);
 
@@ -64,7 +65,13 @@ void BranchSimplification::SimplifyIt(std::vector<std::vector<int>> & in, MyGrap
     int num = boost::connected_components(Simplified, componentMap.data());
 
 
-    std::vector<bool> duplicateCatcher(boost::num_vertices(Simplified));
+    std::vector<bool> duplicateCatcher(cloud.n_cols,0);
+
+    for (int i = 0; i < duplicateCatcher.size(); i++)
+    {
+        std::cout << i << " : " << duplicateCatcher[i] << std::endl;
+
+    }
     std::vector<arma::vec> barycenterSums(num, arma::vec(3));
     for (int i = 0; i < num; i++)
     {
@@ -78,7 +85,7 @@ void BranchSimplification::SimplifyIt(std::vector<std::vector<int>> & in, MyGrap
     {
         int first = in[i][0];
         int second = in[i][in[i].size()-1];
-       if (duplicateCatcher[first] == false)
+        if (duplicateCatcher[first] == false)
         {
             int vertex = CloudToGraph[first];
             barycenterSums[componentMap[vertex]] = barycenterSums[componentMap[vertex]] + cloud.col(first);
@@ -121,25 +128,33 @@ void BranchSimplification::SimplifyIt(std::vector<std::vector<int>> & in, MyGrap
     for (int i = 0; i < num; i++)
     {
         int jjj = Graph::add_vertex(Final,barycenterSums[i]);
-    }
 
+    }
 
     for (int i = 0; i < in.size(); i++)
     {
         int lastindx = in[i].size()-1;
         if (componentMap[CloudToGraph[in[i][0]]] != componentMap[CloudToGraph[in[i][lastindx]]])
         {
+            oldToNew[in[i][0]] = componentMap[CloudToGraph[in[i][0]]];
+            oldToNew[in[i][lastindx]] = componentMap[CloudToGraph[in[i][lastindx]]];
+
+
             if(in[i].size() == 2)
             {
                 Graph::add_edge(Final, componentMap[CloudToGraph[in[i][0]]],componentMap[CloudToGraph[in[i][lastindx]]]);
             }
             int prev = -1;
             int prev2 = -1;
+
             for (int j = 0;  j < in[i].size() - 1; j++)
             {
                 if (j == 0)
                 {
                     prev = Graph::add_vertex(Final, cloud.col(in[i][1]));
+
+                    oldToNew[in[i][1]] = prev;
+
                     Graph::add_edge(Final, prev, componentMap[CloudToGraph[in[i][0]]]);
                 }
                 else if (j == in[i].size() - 2)
@@ -153,6 +168,7 @@ void BranchSimplification::SimplifyIt(std::vector<std::vector<int>> & in, MyGrap
                 {
 
                     prev2 = Graph::add_vertex(Final, cloud.col(in[i][j+1]));
+                    oldToNew[in[i][j+1]] = prev2;
                     Graph::add_edge(Final, prev, prev2);
                     prev = prev2;
 
@@ -160,8 +176,20 @@ void BranchSimplification::SimplifyIt(std::vector<std::vector<int>> & in, MyGrap
 
             }
         }
+        else
+        {
+
+            for (int j = 0 ; j < in[i].size(); j++)
+            {
+               oldToNew[in[i][j]] = componentMap[CloudToGraph[in[i][0]]];
+            }
+
+        }
 
     }
+
+
+
 
 
 //auto edgePair = boost::edges(Simplified)

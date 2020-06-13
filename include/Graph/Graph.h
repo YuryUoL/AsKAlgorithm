@@ -36,6 +36,7 @@ typedef boost::graph_traits<MyGraphType>::edge_iterator edge_iter;
 
 struct EdgeData
 {
+    int order;
     double distance;
     std::vector<int> indices;
     arma::mat segment;

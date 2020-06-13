@@ -4,10 +4,11 @@
 #include "Algorithms/AsK/BranchDetection.h"
 #include "Algorithms/AsK/CorrectStraightening.h"
 #include "Algorithms/AsK/BranchSimplification.h"
+#include "Algorithms/PostProcessing/PostProcessor.h"
 
 
-AsKLauncher::AsKLauncher(double a, double b, double c, std::string name = "AsK"):
-    branch_detection(a),approxError(b),simplificationError(c),numberOfRuns(0)
+AsKLauncher::AsKLauncher(double a, double b, double c, std::string name = "AsK", bool simpleMode = true,  bool postProcessSwitch = false):
+    branch_detection(a),approxError(b),simplificationError(c),numberOfRuns(0),simpleMode(simpleMode), postProcessSwitch(postProcessSwitch)
 {
 }
 void AsKLauncher::Run(arma::mat & data, MyGraphType & out)
@@ -30,6 +31,7 @@ void AsKLauncher::Run(arma::mat & data, MyGraphType & out)
     std::vector<int> newToOld;
     std::vector<int> correspondance;
 
+
     BranchDetection::branchIndexation(G, branchingParameter, Simplified, oldToNew,  newToOld, correspondance);
     // out = Simplified;
 
@@ -39,10 +41,33 @@ void AsKLauncher::Run(arma::mat & data, MyGraphType & out)
     //!  static double ComputeStraightening(MyGraphType & G, arma::mat & cloud, std::vector<std::vector<int>> & out, double e, std::vector<int> & CloudToGraph, std::vector<int> & GraphToCloud)
     //OutputPrinter::DebugGraph("/home/yury/LocalTests4/Debug/zero.txt" , Simplified);
 
-    double distanceThreshttt = CorrectStraightening::ComputeStraightening(Simplified, data, SimplifiedPaths, this->approxError, oldToNew, newToOld, correspondance);
+    std::vector<int> belonghood(data.n_cols,-1);
+    double distanceThreshttt = CorrectStraightening::ComputeStraightening(Simplified, data, SimplifiedPaths, this->approxError, oldToNew, newToOld, correspondance, belonghood);
+
+    //! MassiveDebug:
+    //! ----------
+
+    std::vector<int> oldToNewTmp(data.n_cols,-1);
+
+    BranchSimplification::SimplifyIt(SimplifiedPaths, out, this->simplificationError * distanceThreshttt, data, oldToNewTmp);
 
 
-    BranchSimplification::SimplifyIt(SimplifiedPaths, out, this->simplificationError * distanceThreshttt, data);
+
+
+    if (this->postProcessSwitch)
+    {
+        this->ReIndexBelonghood(belonghood,  oldToNewTmp);
+        std::vector<int> coppy = belonghood;
+        this->FixedBelonghood(belonghood, out);
+        this->CompletePostProcessing(belonghood,coppy,  out, data );
+    }
+
+
+    // OutputPrinter::InfoToCsvSeparate("/home/yury/LocalTests4/PPThree/debug.csv", belonghood, data);
+
+
+
+
 //
 //    //! Temporalily:
 //    std::cout << "Final paths of the form: " << SimplifiedPaths.size() << std::endl;
@@ -52,11 +77,46 @@ void AsKLauncher::Run(arma::mat & data, MyGraphType & out)
 //
 //    }
 //! Temporal
-   //this->ConvertToGraph(SimplifiedPaths, data, out);
+    //this->ConvertToGraph(SimplifiedPaths, data, out);
 //    //BranchSimplification::
 //
 //
 //    std::string actualSettings = this->settings;
+
+}
+
+void AsKLauncher::FixedBelonghood(std::vector<int> & belonghood, MyGraphType & out)
+{
+    std::vector<int> redirection(boost::num_vertices(out));
+    for (int i = 0 ; i < redirection.size(); i++)
+    {
+        redirection[i] = i;
+
+    }
+    for (int i = 0; i < boost::num_vertices(out) ;  i++)
+    {
+        if (boost::out_degree(i,out) == 1)
+        {
+            int vertex = *(boost::adjacent_vertices(i,out).first);
+            redirection[i] = vertex;
+
+        }
+    }
+    for (int i = 0; i < belonghood.size(); i++)
+    {
+        belonghood[i] = redirection[belonghood[i]];
+
+
+    }
+
+}
+
+void AsKLauncher::ReIndexBelonghood(std::vector<int> & belonghood, std::vector<int> & oldToNew)
+{
+    for (int i = 0; i < belonghood.size(); i++)
+    {
+        belonghood[i] = oldToNew[belonghood[i]];
+    }
 
 }
 
@@ -102,6 +162,31 @@ double AsKLauncher::ComputeAverageEdge(MyGraphType & G)
 
     }
     return sum / (double) boost::num_edges(G);
+}
+
+void AsKLauncher::CompletePostProcessing(std::vector<int> & belonghood, std::vector<int> & originAlloc, MyGraphType & G, arma::mat & Cloud )
+{
+//   PostProcessor::PostProcess(this->cloudout, this->abstractGraphOut, this->concreateGraphOut, this->belonghoodOut,  G,  belonghood, Cloud);
+    if (this->simpleMode)
+    {
+        PostProcessor::PostProcessSimple(this->cloudout, this->abstractGraphOut, this->concreateGraphOut, this->belonghoodOut,  G,  Cloud);
+    }
+    else
+    {
+        PostProcessor::PostProcess(this->cloudout, this->abstractGraphOut, this->concreateGraphOut, this->belonghoodOut, this-> PointIndices, G, belonghood,originAlloc, Cloud);
+    }
+
+}
+
+void AsKLauncher::SetPostProcessing(std::string cloudout, std::string abstractGraphOut, std::string concreateGraphOut, std::string belonghoodOut, std::string PointIndices)
+{
+    this->cloudout = cloudout;
+    this->abstractGraphOut = abstractGraphOut;
+    this->concreateGraphOut = concreateGraphOut;
+    this->belonghoodOut = belonghoodOut;
+    this->PointIndices = PointIndices;
+
+
 }
 
 //void AsKLauncher::Convert()
